@@ -2,7 +2,7 @@
 
 This Julia package replicates the results presented in Section 6.4 and produces simulations for a wider range of parameter values not presented in the paper.
 
-Paper: [https://doi.org/10.1287/mnsc.2021.4085](https://doi.org/10.1287/mnsc.2021.4085https://doi.org/10.1287/mnsc.2021.4085)
+Paper: [https://doi.org/10.1287/mnsc.2021.4085](https://doi.org/10.1287/mnsc.2021.4085)
 
 ## Dependencies
 - Julia 1.5 (more recent versions should also not break things)
