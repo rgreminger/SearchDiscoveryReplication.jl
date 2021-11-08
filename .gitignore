@@ -1,0 +1,7 @@
+Manifest.toml
+*.bson*
+*.tex
+*.pdf
+*.lyx*
+tmp*
+**/gen
