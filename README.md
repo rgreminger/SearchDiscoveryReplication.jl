@@ -22,5 +22,14 @@ Paper: [https://doi.org/10.1287/mnsc.2021.4085](https://doi.org/10.1287/mnsc.202
 
 Documentation for the functions is provided through docstrings, which in Julia can be accessed through `?function` (e.g. `?runSimulations`). 
 
-## Additional notes
+## Additional notes 
+
+###  Reservation values 
+The following document provides the additional derivations underlying two functions in *src/reservation_values.jl*: [notes_reservation_values.pdf](https://rgreminger.github.io/files/notes_reservation_values.pdf)
+
+(Github unfortunately does not render LaTex equations...)
+
+### Multi-threading 
 Several core functions can use multi-threading for considerable performance improvements. To use this, start Julia with multiple threads enabled (see [Julia Docs](https://docs.julialang.org/en/v1/manual/multi-threading)).
+
+

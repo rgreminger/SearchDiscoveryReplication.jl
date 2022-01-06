@@ -37,27 +37,26 @@ function calcZd(G::Normal,cs,cd,nd)
 end
 
 
-function cdfW(z,xi,μ,σ)
+function cdfW(z,ξ,μ,σ)
 	a = 1/sqrt(1+σ^2)
-	return cdf(Normal(),(z-xi-μ)/σ) + cdf(Normal(),(z-μ)*a) - cdf(BiNormal(σ*a),[(z-μ)*a,(z-xi-μ)/σ])
+	return cdf(Normal(),(z-ξ-μ)/σ) + cdf(Normal(),(z-μ)*a) - cdf(BiNormal(σ*a),[(z-μ)*a,(z-ξ-μ)/σ])
 end
 
-function integrateCdfMax(z,xi,μ,σ,nd)
-	return quadgk(t -> 1 - cdfW(t,xi,μ,σ)^nd,z,Inf)[1] + z
+function integrateCdfMax(z,ξ,μ,σ,nd)
+	return quadgk(t -> 1 - cdfW(t,ξ,μ,σ)^nd,z,Inf)[1] + z
 end
 
-function integrateCdfSingle(z,xi,cs,mu,sig)
-	a = z-mu ; b = sig
+function integrateCdfSingle(z,ξ,cs,μ,σ)
+	a = z-μ ; b = z-ξ-μ ; c = 1/sqrt(1+σ^2) 
+
 	f(x) = pdf(Normal(),x)
 	F(x) = cdf(Normal(),x)
 
-	return (1-F((z-xi-mu)/sig))*(mu-z -cs)+sig*f((z-xi-mu)/sig) +
-			(z-mu)*cdf(BiNormal(-b/sqrt(1+b^2)),[a/sqrt(1+b^2),(mu+xi-z)/sig]) -
-			sig*(-b/sqrt(1+b^2)*f(a/sqrt(1+b^2))*(1-F((z-xi-mu)/sig*sqrt(1+b^2)-a*b/sqrt(1+b^2)))
-				+ F(a-b*(z-xi-mu)/sig)*f((z-xi-mu)/sig)) +
-				1.0/sqrt(1+b^2)*f(a/sqrt(1+b^2))*(1-F((z-xi-mu)/sig*sqrt(1+b^2)-a*b/sqrt(1+b^2)))
+	return (1-F(b/σ))*(μ-z -cs)+σ*f(b/σ) +
+			(z-μ) * (F(a*c) -cdf(BiNormal(σ*c),[a*c,b/σ]) )	- 
+			σ*(-σ*c*f(a*c)*(1-F(b/σ/c-a*σ*c)) + F(a-b)*f(b/σ)) +
+				c*f(a*c)*(1-F(b/σ/c-a*σ*c))
 end
-
 
 ################################################################################
 # Search value
@@ -82,14 +81,14 @@ function calcZs(x,F::Distribution,cs::T) where T
 		return zs
 	else
 		if F == Normal() # Faster way when having std normal, and also structured to be suitable for Autodiff
-			fz_N(cs) = fzero(xi-> -xi + xi*cdf(F,xi)+pdf(F,xi)-cs ,-abs(cs)*10,100*std(F))
-			xi = fz_N(cs) 
-			zs .= x .+ xi
+			fz_N(cs) = fzero(ξ-> -ξ + ξ*cdf(F,ξ)+pdf(F,ξ)-cs ,-abs(cs)*10,100*std(F))
+			ξ = fz_N(cs) 
+			zs .= x .+ ξ
 			return zs
 		else
-			fz(cs) = fzero(xi->zs_inner_integral(xi,F)-cs,-cs,30*std(F))
-			xi = fz(cs)
-			zs .= x .+ xi
+			fz(cs) = fzero(ξ->zs_inner_integral(ξ,F)-cs,-cs,30*std(F))
+			ξ = fz(cs)
+			zs .= x .+ ξ
 			return zs
 		end
 	end
@@ -120,3 +119,5 @@ function zs_inner_integral(ξ,F::Normal)
 	 μ = mean(F)
 	 return (1.0-cdf(Normal(),(ξ-μ)/σ))*(μ - ξ) + σ * pdf(Normal(),(ξ-μ)/σ)
  end
+
+ 
